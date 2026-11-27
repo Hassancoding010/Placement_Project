@@ -5,8 +5,7 @@ import { getProfile } from "@/lib/api";
 async function EditContent({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
 
-  // Mock lookup by index. B's GET /api/profile/[id] will replace this.
-const profile = await getProfile(id);
+  const profile = await getProfile(id);
 
   if (!profile) {
     return (

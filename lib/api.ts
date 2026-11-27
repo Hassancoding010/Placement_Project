@@ -1,37 +1,41 @@
 import { mockProfiles, type Profile } from "./mock";
+import { publicToProfile } from "./public-view";
+import { getProfileAction, getPublicProfileAction, listProfilesAction } from "./server/queries";
 
 export type FullProfile = Profile & { id: string; public_token: string };
 
-// Set to false once the backend APIs are ready.
-const USE_MOCK = true;
+const USE_MOCK = false;
 
 function withIds(p: Profile, i: number): FullProfile {
   // In mock mode the id and the public token are both the array index.
   return { ...p, id: String(i), public_token: String(i) };
 }
 
-// GET /api/profile
 export async function listProfiles(): Promise<FullProfile[]> {
   if (USE_MOCK) return mockProfiles.map(withIds);
-  // TODO (real): fetch("/api/profile") and return the list.
-  throw new Error("Real API not connected yet");
+  return listProfilesAction();
 }
 
-// GET /api/profile/[id]
 export async function getProfile(id: string): Promise<FullProfile | null> {
   if (USE_MOCK) {
     const p = mockProfiles[Number(id)];
     return p ? withIds(p, Number(id)) : null;
   }
-  // TODO (real): fetch(`/api/profile/${id}`), return null on 404.
-  throw new Error("Real API not connected yet");
+  return getProfileAction(id);
 }
 
-// GET /api/public/[token]  (only public fields in the real version)
+export class RateLimitedError extends Error {
+  constructor() {
+    super("Too many requests");
+    this.name = "RateLimitedError";
+  }
+}
+
 export async function getPublicProfile(token: string): Promise<Profile | null> {
   if (USE_MOCK) return mockProfiles[Number(token)] ?? null;
-  // TODO (real): fetch(`/api/public/${token}`), return null on 404.
-  throw new Error("Real API not connected yet");
+  const result = await getPublicProfileAction(token);
+  if (result.status === "rate-limited") throw new RateLimitedError();
+  return result.status === "found" ? publicToProfile(result.profile) : null;
 }
 
 // POST /api/profile (create) or PUT /api/profile/[id] (edit)
@@ -47,6 +51,21 @@ export async function saveProfile(
     );
     return { ok: true };
   }
-  // TODO (real): send the request and return { ok: false, error } on failure.
-  throw new Error("Real API not connected yet");
+  const failure = { ok: false, error: "Could not save. Please try again." };
+  if (mode === "edit" && !id) return failure;
+
+  try {
+    const path = mode === "create" ? "/api/profile" : `/api/profile/${encodeURIComponent(id ?? "")}`;
+    const response = await fetch(path, {
+      method: mode === "create" ? "POST" : "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    });
+    if (response.ok) return { ok: true };
+
+    const body = await response.json();
+    return typeof body?.error === "string" ? { ok: false, error: body.error } : failure;
+  } catch {
+    return failure;
+  }
 }

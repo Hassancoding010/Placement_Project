@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { createClient } from "@/lib/supabase/client";
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 export default function SignupPage() {
   const router = useRouter();
@@ -10,17 +11,24 @@ export default function SignupPage() {
   const [confirm, setConfirm] = useState("");
   const [error, setError] = useState("");
 
-  function handleSubmit(e: React.FormEvent) {
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError("");
-   if (!EMAIL_REGEX.test(email.trim()))
-  return setError("Enter a valid email address, like name@gmail.com.");
+    if (!EMAIL_REGEX.test(email.trim()))
+      return setError("Enter a valid email address, like name@gmail.com.");
     if (password.length < 6)
       return setError("Password must be at least 6 characters.");
     if (password !== confirm) return setError("Passwords do not match.");
 
-    // Mock sign-up. B will replace this with Supabase auth.
+    const { data, error } = await createClient().auth.signUp({
+      email: email.trim(),
+      password,
+    });
+    if (error) return setError(error.message);
+    if (!data.session) return setError("Check your email to confirm your account.");
+
     router.push("/dashboard");
+    router.refresh();
   }
 
   const input = "w-full border rounded-lg p-3 bg-white text-gray-900";

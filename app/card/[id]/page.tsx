@@ -5,7 +5,6 @@ import PrintButton from "@/components/PrintButton";
 async function CardContent({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
 
-  // Mock lookup by index. B's GET /api/profile/[id] will replace this.
   const p = await getProfile(id);
 
   if (!p) {
@@ -52,14 +51,9 @@ async function CardContent({ params }: { params: Promise<{ id: string }> }) {
             </div>
           </div>
 
-          {/* QR placeholder. Replace with <img src={`/api/qr/${id}`} /> once B's API is ready. */}
-          <div className="flex flex-col items-center justify-center">
-            <div
-              className="bg-gray-200 border border-gray-400 flex items-center justify-center text-xs text-gray-600 text-center"
-              style={{ width: "120px", height: "120px" }}
-            >
-              QR code
-            </div>
+          <div className="flex shrink-0 flex-col items-center justify-center">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src={`/api/qr/${p.id}`} alt="QR code" width={120} height={120} />
             <p className="text-[10px] text-gray-500 mt-1 text-center">
               Scan for medical info
             </p>
@@ -67,7 +61,14 @@ async function CardContent({ params }: { params: Promise<{ id: string }> }) {
         </div>
       </div>
 
-      <PrintButton />
+      <PrintButton>
+        <a
+          href={`/api/card/${p.id}`}
+          className="bg-blue-600 text-white rounded-lg px-5 py-3 font-semibold"
+        >
+          Download PDF
+        </a>
+      </PrintButton>
     </main>
   );
 }

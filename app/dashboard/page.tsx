@@ -19,9 +19,11 @@ export default async function DashboardPage() {
             >
               + New profile
             </Link>
-            <Link href="/login" className="text-sm text-gray-600 underline">
-              Log out
-            </Link>
+            <form action="/auth/signout" method="post">
+              <button type="submit" className="cursor-pointer text-sm text-gray-600 underline">
+                Log out
+              </button>
+            </form>
           </div>
         </div>
 
