@@ -1,6 +1,7 @@
+import { Suspense } from "react";
 import { mockProfiles } from "@/lib/mock";
 
-export default async function EmergencyPage({
+async function EmergencyContent({
   params,
 }: {
   params: Promise<{ token: string }>;
@@ -83,5 +84,23 @@ function Section({
         </ul>
       )}
     </div>
+  );
+}
+
+export default function EmergencyPage({
+  params,
+}: {
+  params: Promise<{ token: string }>;
+}) {
+  return (
+    <Suspense
+      fallback={
+        <main className="min-h-screen flex items-center justify-center text-gray-600">
+          Loading...
+        </main>
+      }
+    >
+      <EmergencyContent params={params} />
+    </Suspense>
   );
 }
