@@ -223,7 +223,7 @@ In a fresh window, the loop returns 20 `404` responses followed by a `429`. Earl
 4. Deploy the production branch through the Git integration or run `vercel deploy --prod` from the linked project directory. If Vercel already deployed before the environment variables were added, redeploy to apply them. [Vercel deployments](https://vercel.com/docs/deployments)
 5. Sign in on the deployed site, create a fake profile, and scan its QR code with a phone. Confirm that the emergency page opens at the production URL without signing in, shows the expected public fields, and sends a Telegram alert when configured.
 
-Live demo: `<add URL>`
+Live demo: https://emergency-health-card-peach.vercel.app
 
 ## Testing
 
