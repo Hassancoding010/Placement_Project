@@ -24,10 +24,18 @@ export async function getProfile(id: string): Promise<FullProfile | null> {
   return getProfileAction(id);
 }
 
+export class RateLimitedError extends Error {
+  constructor() {
+    super("Too many requests");
+    this.name = "RateLimitedError";
+  }
+}
+
 export async function getPublicProfile(token: string): Promise<Profile | null> {
   if (USE_MOCK) return mockProfiles[Number(token)] ?? null;
-  const view = await getPublicProfileAction(token);
-  return view ? publicToProfile(view) : null;
+  const result = await getPublicProfileAction(token);
+  if (result.status === "rate-limited") throw new RateLimitedError();
+  return result.status === "found" ? publicToProfile(result.profile) : null;
 }
 
 // POST /api/profile (create) or PUT /api/profile/[id] (edit)

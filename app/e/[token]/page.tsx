@@ -1,5 +1,5 @@
 import { Suspense } from "react";
-import { getPublicProfile } from "@/lib/api";
+import { getPublicProfile, RateLimitedError } from "@/lib/api";
 
 async function EmergencyContent({
   params,
@@ -8,7 +8,19 @@ async function EmergencyContent({
 }) {
   const { token } = await params;
 
-  const p = await getPublicProfile(token);
+  let p;
+  try {
+    p = await getPublicProfile(token);
+  } catch (error) {
+    if (!(error instanceof RateLimitedError)) throw error;
+    return (
+      <main className="min-h-screen flex items-center justify-center bg-gray-50 p-6 text-gray-900">
+        <h1 className="max-w-md text-center text-2xl font-bold">
+          Too many requests, please wait a minute and try again
+        </h1>
+      </main>
+    );
+  }
 
   if (!p) {
     return (

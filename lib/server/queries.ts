@@ -1,9 +1,13 @@
 "use server";
 
+import { headers } from "next/headers";
+import { connection } from "next/server";
 import { createClient } from "../supabase/server";
-import { getProfile, getPublicProfile, listProfiles } from "./profiles";
+import { getProfile, listProfiles } from "./profiles";
+import { viewPublicProfile } from "./view-public-profile";
 
 async function ownerClient() {
+  await connection();
   const supabase = await createClient();
   const { data, error } = await supabase.auth.getClaims();
   return !error && data?.claims.sub ? supabase : null;
@@ -20,6 +24,6 @@ export async function getProfileAction(id: string) {
 }
 
 export async function getPublicProfileAction(token: string) {
-  const supabase = await createClient();
-  return getPublicProfile(supabase, token);
+  await connection();
+  return viewPublicProfile(token, await headers());
 }

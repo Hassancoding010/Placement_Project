@@ -1,12 +1,22 @@
-import { beforeEach, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, expect, it, vi } from "vitest";
 import { fakeSupabase } from "@/lib/server/profiles.test-support";
 import { createClient } from "@/lib/supabase/server";
 import { GET } from "./route";
 
 vi.mock("server-only", () => ({}));
+vi.mock("next/server", () => ({ after: vi.fn() }));
 vi.mock("@/lib/supabase/server", () => ({ createClient: vi.fn() }));
 
-beforeEach(() => vi.resetAllMocks());
+beforeEach(() => {
+  vi.resetAllMocks();
+  vi.stubEnv("NEXT_PUBLIC_SUPABASE_URL", "https://supabase.example");
+  vi.stubEnv("SUPABASE_SECRET_KEY", "test-secret-key");
+  vi.stubGlobal("fetch", vi.fn().mockResolvedValue(Response.json(true)));
+});
+afterEach(() => {
+  vi.unstubAllEnvs();
+  vi.unstubAllGlobals();
+});
 
 const token = "public-token";
 const context = { params: Promise.resolve({ token }) };
@@ -35,4 +45,13 @@ it("returns the documented 404 for an unknown token", async () => {
 
   expect(response.status).toBe(404);
   expect(await response.json()).toEqual({ error: "Profile not found" });
+});
+
+it("returns the documented 429 when the client is over the limit", async () => {
+  vi.stubGlobal("fetch", vi.fn().mockResolvedValue(Response.json(false)));
+
+  const response = await GET(request, context);
+
+  expect(response.status).toBe(429);
+  expect(await response.json()).toEqual({ error: "Too many requests" });
 });

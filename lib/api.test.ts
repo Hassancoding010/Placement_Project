@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, expect, it, vi } from "vitest";
-import { getProfile, getPublicProfile, listProfiles, saveProfile } from "./api";
+import { getProfile, getPublicProfile, listProfiles, RateLimitedError, saveProfile } from "./api";
 import { getProfileAction, getPublicProfileAction, listProfilesAction } from "./server/queries";
 
 vi.mock("./server/queries", () => ({
@@ -33,14 +33,23 @@ it("retrieves the requested owner profile for editing", async () => {
 it("adapts a shared profile to the emergency page and preserves missing tokens", async () => {
   vi.mocked(getPublicProfileAction).mockImplementation(async (token) =>
     token === fullProfile.public_token
-      ? { full_name: "Ravi", age: 72, blood_group: "B+", contacts: profile.contacts, doctor_name: "Dr. Rao" }
-      : null,
+      ? {
+          status: "found",
+          profile: { full_name: "Ravi", age: 72, blood_group: "B+", contacts: profile.contacts, doctor_name: "Dr. Rao" },
+        }
+      : { status: "not-found" },
   );
 
   await expect(getPublicProfile(fullProfile.public_token)).resolves.toEqual({
     ...profile, doctor_name: "Dr. Rao", public: { ...profile.public, doctor_name: true },
   });
   await expect(getPublicProfile("missing")).resolves.toBeNull();
+});
+
+it("distinguishes a blocked emergency page request from an unknown token", async () => {
+  vi.mocked(getPublicProfileAction).mockResolvedValue({ status: "rate-limited" });
+
+  await expect(getPublicProfile(fullProfile.public_token)).rejects.toBeInstanceOf(RateLimitedError);
 });
 
 it.each([
