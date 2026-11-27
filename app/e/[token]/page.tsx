@@ -8,8 +8,6 @@ async function EmergencyContent({
 }) {
   const { token } = await params;
 
-  // Mock lookup: token "0" or "1" picks a sample profile.
-  // B's GET /api/public/[token] will replace this.
   const p = await getPublicProfile(token);
 
   if (!p) {

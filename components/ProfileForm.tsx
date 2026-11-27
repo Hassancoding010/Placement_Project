@@ -56,7 +56,9 @@ export default function ProfileForm({
 
     if (!fullName.trim()) return setError("Full name is required.");
     const ageNum = Number(age);
-    if (!ageNum || ageNum < 0 || ageNum > 120) return setError("Enter a valid age.");
+    if (!age.trim() || !Number.isInteger(ageNum) || ageNum < 0 || ageNum > 120) {
+      return setError("Enter a valid age.");
+    }
     if (!bloodGroup) return setError("Select a blood group.");
 
     const filled = contacts.filter((c) => c.name || c.phone);
@@ -80,14 +82,17 @@ export default function ProfileForm({
     };
 
     setSaving(true);
-const result = await saveProfile(mode, id, payload);
-setSaving(false);
+    const result = await saveProfile(mode, id, payload);
+    setSaving(false);
 
-if (!result.ok) {
-  return setError(result.error ?? "Could not save. Please try again.");
-}
-setSuccess(mode === "create" ? "Profile saved. Redirecting..." : "Changes saved. Redirecting...");
-setTimeout(() => router.push("/dashboard"), 1000);
+    if (!result.ok) {
+      return setError(result.error ?? "Could not save. Please try again.");
+    }
+    setSuccess(mode === "create" ? "Profile saved. Redirecting..." : "Changes saved. Redirecting...");
+    setTimeout(() => {
+      router.push("/dashboard");
+      router.refresh();
+    }, 1000);
   }
 
   const input = "w-full border rounded-lg p-3 bg-white text-gray-900";

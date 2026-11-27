@@ -2,6 +2,7 @@
 import Logo from "@/components/Logo";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { createClient } from "@/lib/supabase/client";
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 export default function LoginPage() {
   const router = useRouter();
@@ -9,7 +10,7 @@ export default function LoginPage() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
 
-  function handleSubmit(e: React.FormEvent) {
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError("");
     if (!EMAIL_REGEX.test(email.trim()))
@@ -18,8 +19,14 @@ export default function LoginPage() {
       setError("Password must be at least 6 characters.");
       return;
     }
-    // Mock sign-in. B will replace this with Supabase auth.
+    const { error } = await createClient().auth.signInWithPassword({
+      email: email.trim(),
+      password,
+    });
+    if (error) return setError(error.message);
+
     router.push("/dashboard");
+    router.refresh();
   }
 
   return (

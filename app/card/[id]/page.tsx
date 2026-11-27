@@ -5,7 +5,6 @@ import PrintButton from "@/components/PrintButton";
 async function CardContent({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
 
-  // Mock lookup by index. B's GET /api/profile/[id] will replace this.
   const p = await getProfile(id);
 
   if (!p) {
