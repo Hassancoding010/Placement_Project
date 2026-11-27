@@ -41,9 +41,12 @@ export default function DashboardPage() {
                   <button className="border rounded-lg px-3 py-2">
                     View QR
                   </button>
-                  <button className="border rounded-lg px-3 py-2">
-                    Download card
-                  </button>
+                  <Link
+  href={`/card/${i}`}
+  className="border rounded-lg px-3 py-2"
+>
+  Download card
+</Link>
                 </div>
               </li>
             ))}
