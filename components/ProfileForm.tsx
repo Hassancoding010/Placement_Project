@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import type { Profile } from "@/lib/mock";
+import { saveProfile } from "@/lib/api";
 
 const BLOOD_GROUPS = ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"];
 
@@ -12,9 +13,11 @@ const emptyContact: Contact = { name: "", phone: "", relation: "" };
 export default function ProfileForm({
   initial,
   mode,
+  id,
 }: {
   initial?: Profile;
   mode: "create" | "edit";
+  id?: string;
 }) {
   const router = useRouter();
   const [fullName, setFullName] = useState(initial?.full_name ?? "");
@@ -37,7 +40,7 @@ export default function ProfileForm({
   );
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
-
+  const [saving, setSaving] = useState(false);
   function updateContact(i: number, field: keyof Contact, value: string) {
     setContacts(contacts.map((c, idx) => (idx === i ? { ...c, [field]: value } : c)));
   }
@@ -46,7 +49,7 @@ export default function ProfileForm({
     return text.split(",").map((s) => s.trim()).filter(Boolean);
   }
 
-  function handleSubmit(e: React.FormEvent) {
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError("");
     setSuccess("");
@@ -76,13 +79,15 @@ export default function ProfileForm({
       public: pub,
     };
 
-    // Mock save. B's POST /api/profile (create) or PUT /api/profile/[id] (edit) will replace this.
-    console.log(
-      mode === "create" ? "Would POST /api/profile:" : "Would PUT /api/profile/[id]:",
-      payload
-    );
-    setSuccess(mode === "create" ? "Profile saved (mock). Redirecting..." : "Changes saved (mock). Redirecting...");
-    setTimeout(() => router.push("/dashboard"), 1000);
+    setSaving(true);
+const result = await saveProfile(mode, id, payload);
+setSaving(false);
+
+if (!result.ok) {
+  return setError(result.error ?? "Could not save. Please try again.");
+}
+setSuccess(mode === "create" ? "Profile saved. Redirecting..." : "Changes saved. Redirecting...");
+setTimeout(() => router.push("/dashboard"), 1000);
   }
 
   const input = "w-full border rounded-lg p-3 bg-white text-gray-900";
@@ -170,9 +175,13 @@ export default function ProfileForm({
         {success && <p className="text-green-600 text-sm">{success}</p>}
 
         <div className="flex gap-3">
-          <button type="submit" className="flex-1 bg-blue-600 text-white rounded-lg p-3 font-semibold">
-            {mode === "create" ? "Save profile" : "Save changes"}
-          </button>
+          <button
+  type="submit"
+  disabled={saving}
+  className="flex-1 bg-blue-600 text-white rounded-lg p-3 font-semibold disabled:opacity-60"
+>
+  {saving ? "Saving..." : mode === "create" ? "Save profile" : "Save changes"}
+</button>
           <button
             type="button"
             onClick={() => router.push("/dashboard")}

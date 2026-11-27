@@ -1,5 +1,5 @@
 import { Suspense } from "react";
-import { mockProfiles } from "@/lib/mock";
+import { getPublicProfile } from "@/lib/api";
 
 async function EmergencyContent({
   params,
@@ -10,7 +10,7 @@ async function EmergencyContent({
 
   // Mock lookup: token "0" or "1" picks a sample profile.
   // B's GET /api/public/[token] will replace this.
-  const p = mockProfiles[Number(token)];
+  const p = await getPublicProfile(token);
 
   if (!p) {
     return (

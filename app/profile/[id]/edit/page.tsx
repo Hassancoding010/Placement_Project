@@ -1,12 +1,12 @@
 import { Suspense } from "react";
 import ProfileForm from "@/components/ProfileForm";
-import { mockProfiles } from "@/lib/mock";
+import { getProfile } from "@/lib/api";
 
 async function EditContent({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
 
   // Mock lookup by index. B's GET /api/profile/[id] will replace this.
-  const profile = mockProfiles[Number(id)];
+const profile = await getProfile(id);
 
   if (!profile) {
     return (
@@ -21,7 +21,7 @@ async function EditContent({ params }: { params: Promise<{ id: string }> }) {
     );
   }
 
-  return <ProfileForm mode="edit" initial={profile} />;
+  return <ProfileForm mode="edit" id={id} initial={profile} />;
 }
 
 export default function EditProfilePage({
