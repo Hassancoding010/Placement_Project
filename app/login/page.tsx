@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 export default function LoginPage() {
   const router = useRouter();
   const [email, setEmail] = useState("");
@@ -12,10 +12,8 @@ export default function LoginPage() {
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError("");
-    if (!email.includes("@")) {
-      setError("Enter a valid email address.");
-      return;
-    }
+    if (!EMAIL_REGEX.test(email.trim()))
+      return setError("Enter a valid email address, like name@gmail.com.");
     if (password.length < 6) {
       setError("Password must be at least 6 characters.");
       return;
