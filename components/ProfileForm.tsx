@@ -96,9 +96,19 @@ setTimeout(() => router.push("/dashboard"), 1000);
   return (
     <main className="min-h-screen bg-gray-50 p-4 sm:p-8 text-gray-900">
       <form onSubmit={handleSubmit} className="max-w-xl mx-auto bg-white p-6 rounded-xl shadow space-y-5">
-        <h1 className="text-2xl font-bold">
-          {mode === "create" ? "New profile" : "Edit profile"}
-        </h1>
+        <div className="sticky top-0 z-10 bg-white -mx-6 -mt-6 px-6 py-4 flex items-center justify-between border-b rounded-t-xl">
+  <h1 className="text-2xl font-bold">
+    {mode === "create" ? "New profile" : "Edit profile"}
+  </h1>
+  <button
+    type="button"
+    onClick={() => router.push("/dashboard")}
+    aria-label="Close"
+    className="w-10 h-10 rounded-full text-2xl leading-none text-gray-500 hover:bg-gray-100"
+  >
+    ×
+  </button>
+</div>
 
         <div>
           <label className={label}>Full name</label>

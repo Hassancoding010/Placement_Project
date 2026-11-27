@@ -1,5 +1,5 @@
 "use client";
-
+import Logo from "@/components/Logo";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
@@ -28,6 +28,9 @@ export default function LoginPage() {
         onSubmit={handleSubmit}
         className="w-full max-w-sm bg-white p-6 rounded-xl shadow space-y-4"
       >
+        <div className="mb-2">
+          <Logo />
+        </div>
         <h1 className="text-2xl font-bold">Log in</h1>
         <input
           type="email"

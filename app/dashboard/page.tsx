@@ -1,12 +1,15 @@
 import Link from "next/link";
 import { listProfiles } from "@/lib/api";
-
+import Logo from "@/components/Logo";
 export default async function DashboardPage() {
   const profiles = await listProfiles();
 
   return (
     <main className="min-h-screen bg-gray-50 p-4 sm:p-8 text-gray-900">
       <div className="max-w-2xl mx-auto">
+        <div className="mb-4">
+  <Logo />
+</div>
         <div className="flex items-center justify-between mb-6">
           <h1 className="text-2xl font-bold">Your profiles</h1>
           <div className="flex items-center gap-3">

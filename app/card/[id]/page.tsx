@@ -22,11 +22,11 @@ async function CardContent({ params }: { params: Promise<{ id: string }> }) {
   }
 
   return (
-    <main className="min-h-screen bg-gray-100 p-6 text-gray-900 flex flex-col items-center gap-6">
-      {/* The card: credit-card proportions (85.6 x 54 mm) */}
+    <main className="min-h-screen bg-gray-100 p-4 text-gray-900 flex flex-col items-center gap-6">
+      {/* The card: credit-card proportions (85.6 x 54 mm). Shrinks on phones, full size on larger screens and in print. */}
       <div
         id="health-card"
-        className="bg-white border-2 border-red-600 rounded-2xl overflow-hidden shadow-lg"
+        className="bg-white border-2 border-red-600 rounded-2xl overflow-hidden shadow-lg [zoom:0.78] sm:[zoom:1] print:[zoom:1]"
         style={{ width: "428px", height: "270px" }}
       >
         <div className="bg-red-600 text-white px-4 py-2 flex items-center justify-between">
