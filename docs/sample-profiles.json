@@ -1,0 +1,29 @@
+[
+  {
+    "full_name": "Ravi Kumar",
+    "age": 72,
+    "blood_group": "B+",
+    "allergies": ["Penicillin"],
+    "conditions": ["Type 2 diabetes", "Hypertension"],
+    "medicines": ["Metformin 500mg", "Amlodipine 5mg"],
+    "doctor_name": "Dr. Meena Rao",
+    "contacts": [
+      { "name": "Anita Kumar", "phone": "+919800000001", "relation": "Daughter" },
+      { "name": "Suresh Kumar", "phone": "+919800000002", "relation": "Son" }
+    ],
+    "public": { "allergies": true, "conditions": true, "medicines": true, "doctor_name": false }
+  },
+  {
+    "full_name": "Lakshmi Devi",
+    "age": 68,
+    "blood_group": "O+",
+    "allergies": ["Sulfa drugs", "Peanuts"],
+    "conditions": ["Early-stage Alzheimer's"],
+    "medicines": ["Donepezil 5mg"],
+    "doctor_name": "Dr. Arjun Shetty",
+    "contacts": [
+      { "name": "Priya Nair", "phone": "+919800000003", "relation": "Daughter" }
+    ],
+    "public": { "allergies": true, "conditions": true, "medicines": false, "doctor_name": false }
+  }
+]
